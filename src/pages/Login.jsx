@@ -140,11 +140,6 @@ const Login = () => {
                         {isLogin ? 'Sign up' : 'Login'}
                     </button>
                 </p>
-                <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', color: '#666' }}>
-                    Demo Credentials:<br />
-                    Email: demo@globetrotter.com<br />
-                    Pass: demo123
-                </div>
             </div>
         </div>
     );
