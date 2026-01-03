@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTrips } from '../context/TripContext';
-import { Calendar, MapPin, Clock, DollarSign, Plus, ArrowLeft, Share2, Printer } from 'lucide-react';
+import { Calendar, MapPin, Clock, DollarSign, Plus, ArrowLeft, Trash2, Printer } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 
 const ItineraryView = () => {
     const { tripId } = useParams();
-    const { trips, selectTrip, currentTrip, addActivityToTrip, currencySymbol, convertCost } = useTrips();
+    const { trips, selectTrip, currentTrip, addActivityToTrip, deleteActivityFromTrip, currencySymbol, convertCost } = useTrips();
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
     const [showAddModal, setShowAddModal] = useState(false);
     const [newActivity, setNewActivity] = useState({ title: '', time: '09:00', type: 'sightseeing', cost: 0 });
@@ -55,6 +55,12 @@ const ItineraryView = () => {
         setNewActivity({ title: '', time: '09:00', type: 'sightseeing', cost: 0 });
     };
 
+    const handleDeleteActivity = (actId) => {
+        if (window.confirm('Are you sure you want to remove this activity?')) {
+            deleteActivityFromTrip(tripId, selectedDay.date, actId);
+        }
+    };
+
     return (
         <div className="fade-in">
             {/* Header */}
@@ -76,20 +82,13 @@ const ItineraryView = () => {
                         </span>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button
-                        onClick={() => alert("Share Link Copied to Clipboard! (Demo)")}
-                        className="btn-secondary"
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                    >
-                        <Share2 size={16} /> Share
-                    </button>
+                <div>
                     <button
                         onClick={() => window.print()}
                         className="btn-secondary"
                         style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                     >
-                        <Printer size={16} /> Print
+                        <Printer size={16} /> Print Itinerary
                     </button>
                 </div>
             </div>
@@ -115,9 +114,6 @@ const ItineraryView = () => {
                                 Day {index + 1}
                             </button>
                         ))}
-                        <button onClick={() => {/* Add Day Logic */ }} style={{ padding: '10px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', color: 'white' }}>
-                            <Plus size={16} />
-                        </button>
                     </div>
 
                     {/* Day View */}
@@ -146,7 +142,8 @@ const ItineraryView = () => {
                                     <div key={act.id} style={{
                                         display: 'flex', gap: '20px', padding: '16px',
                                         background: 'rgba(255,255,255,0.03)', borderRadius: '12px',
-                                        borderLeft: `4px solid ${getColorForType(act.type)}`
+                                        borderLeft: `4px solid ${getColorForType(act.type)}`,
+                                        alignItems: 'center'
                                     }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
                                             <span style={{ fontWeight: 'bold' }}>{act.time}</span>
@@ -166,6 +163,13 @@ const ItineraryView = () => {
                                                 </span>
                                             </div>
                                         </div>
+                                        <button
+                                            onClick={() => handleDeleteActivity(act.id)}
+                                            style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', padding: '8px' }}
+                                            className="hover-red"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
                                 ))
                             )}
@@ -213,22 +217,21 @@ const ItineraryView = () => {
                         </div>
                     </div>
 
-                    {/* Interactive Map Mock */}
+                    {/* Interactive Map (Google Maps Embed) */}
                     <div className="glass-panel" style={{ padding: '0', overflow: 'hidden', height: '300px', position: 'relative' }}>
                         <iframe
                             width="100%"
                             height="100%"
                             frameBorder="0"
-                            style={{ border: 0, opacity: 0.8 }}
-                            // Note: Using OpenStreetMap for demo to avoid API key requirement issues in playback
-                            src={`https://www.openstreetmap.org/export/embed.html?bbox=-180,-90,180,90&layer=mapnik&marker=${encodeURIComponent(currentTrip.destination)}`}
+                            style={{ border: 0, opacity: 0.9 }}
+                            src={`https://maps.google.com/maps?q=${encodeURIComponent(currentTrip.destination)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
                         ></iframe>
                         <div style={{
                             position: 'absolute', bottom: '10px', left: '10px',
                             background: 'rgba(0,0,0,0.7)', padding: '5px 10px', borderRadius: '4px',
                             pointerEvents: 'none'
                         }}>
-                            <span style={{ fontSize: '12px' }}>Interactive Map: {currentTrip.destination}</span>
+                            <span style={{ fontSize: '12px' }}>Map: {currentTrip.destination}</span>
                         </div>
                     </div>
                 </div>

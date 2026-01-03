@@ -13,6 +13,7 @@ import ItineraryView from './pages/ItineraryView';
 import Profile from './pages/Profile';
 import Admin from './pages/Admin';
 import CitySearch from './pages/CitySearch';
+import MonthlySummary from './pages/MonthlySummary';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -46,6 +47,7 @@ const App = () => {
               <Route path="create-trip" element={<CreateTrip />} />
               <Route path="profile" element={<Profile />} />
               <Route path="admin" element={<Admin />} />
+              <Route path="monthly-summary" element={<MonthlySummary />} />
             </Route>
 
             {/* Catch all */}

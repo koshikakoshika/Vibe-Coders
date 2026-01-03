@@ -22,14 +22,20 @@ export const AuthProvider = ({ children }) => {
         const storedUsers = localStorage.getItem('globeTrotterUsers');
         if (storedUsers) return JSON.parse(storedUsers);
 
-        // Default demo user
+        // Default demo users
         const demoUser = {
             id: 'u1', name: 'Alex Explorer', email: 'demo@globetrotter.com', password: 'demo123',
             avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
             preferences: { theme: 'dark', currency: 'INR' },
             savedDestinations: []
         };
-        return [demoUser];
+        const testUser = {
+            id: 'u2', name: 'Koshika Test', email: 'koshikat03@gmail.com', password: 'koshikakoshika',
+            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Koshika',
+            preferences: { theme: 'dark', currency: 'INR' },
+            savedDestinations: []
+        };
+        return [demoUser, testUser];
     });
 
     useEffect(() => {

@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTrips } from '../context/TripContext';
 import { Calendar, MapPin, DollarSign, Users, Sparkles } from 'lucide-react';
 
 const CreateTrip = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { addTrip, currency, currencySymbol, rates } = useTrips();
     const [formData, setFormData] = useState({
-        destination: '',
+        destination: location.state?.destination || '',
         startDate: '',
         endDate: '',
         budget: '', // Stores the RAW input value

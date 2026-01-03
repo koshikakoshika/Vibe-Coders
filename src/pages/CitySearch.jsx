@@ -62,7 +62,7 @@ const CitySearch = () => {
                             </div>
                             <p style={{ color: '#ccc', marginBottom: '20px' }}>{city.description}</p>
                             <button
-                                onClick={() => navigate('/create-trip')}
+                                onClick={() => navigate('/create-trip', { state: { destination: city.name } })}
                                 className="btn-primary"
                                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                             >
@@ -94,7 +94,7 @@ const CitySearch = () => {
                                     <div style={{ color: '#aaa', fontSize: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                         <MapPin size={14} /> {act.loc}
                                     </div>
-                                    <button className="btn-secondary" style={{ width: '100%', padding: '8px' }} onClick={() => navigate('/create-trip')}>
+                                    <button className="btn-secondary" style={{ width: '100%', padding: '8px' }} onClick={() => navigate('/create-trip', { state: { destination: act.loc } })}>
                                         Add to Trip
                                     </button>
                                 </div>

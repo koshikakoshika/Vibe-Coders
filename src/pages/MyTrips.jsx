@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTrips } from '../context/TripContext';
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Plus, Trash2 } from 'lucide-react';
+import { Calendar, MapPin, Plus, Trash2, PieChart } from 'lucide-react';
 
 const MyTrips = () => {
     const { trips, deleteTrip, currencySymbol, convertCost } = useTrips();
@@ -17,9 +17,14 @@ const MyTrips = () => {
         <div className="fade-in">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                 <h1>My Trips</h1>
-                <Link to="/create-trip" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Plus size={20} /> Plan New Trip
-                </Link>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <Link to="/monthly-summary" className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <PieChart size={20} /> Monthly Travel Summary
+                    </Link>
+                    <Link to="/create-trip" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Plus size={20} /> Plan New Trip
+                    </Link>
+                </div>
             </div>
 
             {trips.length === 0 ? (

@@ -152,7 +152,7 @@ const Dashboard = () => {
                                 <div style={{ color: '#aaa', fontSize: '14px', marginBottom: '16px' }}>
                                     {place.location}
                                 </div>
-                                <Link to="/create-trip" className="btn-secondary" style={{ width: '100%', fontSize: '14px', padding: '8px', display: 'block', textAlign: 'center' }}>
+                                <Link to="/create-trip" state={{ destination: place.location }} className="btn-secondary" style={{ width: '100%', fontSize: '14px', padding: '8px', display: 'block', textAlign: 'center' }}>
                                     Explore Itinerary
                                 </Link>
                             </div>
