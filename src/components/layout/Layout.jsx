@@ -5,8 +5,11 @@ import { Compass, Map, Calendar, User, LogOut, PlusCircle, Globe } from 'lucide-
 import styles from './Layout.module.css';
 import ChatWidget from '../common/ChatWidget';
 
+import { useTrips } from '../../context/TripContext';
+
 const Layout = () => {
     const { user, logout } = useAuth();
+    const { currency, setCurrency } = useTrips();
     const location = useLocation();
 
     const isActive = (path) => location.pathname === path;
@@ -41,6 +44,21 @@ const Layout = () => {
                         <span>Profile</span>
                     </Link>
                 </nav>
+
+                <div style={{ padding: '0 20px', marginBottom: '10px' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '12px', color: '#aaa', marginLeft: '5px' }}>Currency</span>
+                        <select
+                            value={currency}
+                            onChange={(e) => setCurrency(e.target.value)}
+                            style={{ background: 'transparent', border: 'none', color: 'white', fontWeight: 'bold', cursor: 'pointer', outline: 'none' }}
+                        >
+                            <option value="INR" style={{ color: 'black' }}>INR (₹)</option>
+                            <option value="USD" style={{ color: 'black' }}>USD ($)</option>
+                            <option value="EUR" style={{ color: 'black' }}>EUR (€)</option>
+                        </select>
+                    </div>
+                </div>
 
                 <div className={styles.userSection}>
                     <div className={styles.userInfo}>

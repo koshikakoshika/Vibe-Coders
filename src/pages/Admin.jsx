@@ -3,28 +3,35 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Users, Briefcase, Map } from 'lucide-react';
 
 const Admin = () => {
+    // Mock user specific analytics
+    const visitedPlaces = [
+        { id: 1, name: 'Jaipur, Rajasthan', date: '2025-01-15' },
+        { id: 2, name: 'Goa', date: '2024-12-20' },
+        { id: 3, name: 'Manali, HP', date: '2024-11-10' }
+    ];
+
     const data = [
-        { name: 'Jan', users: 400, trips: 240 },
-        { name: 'Feb', users: 300, trips: 139 },
-        { name: 'Mar', users: 500, trips: 980 },
-        { name: 'Apr', users: 278, trips: 390 },
-        { name: 'May', users: 189, trips: 480 },
-        { name: 'Jun', users: 239, trips: 380 },
+        { name: 'Jan', budget: 40000, spent: 24000 },
+        { name: 'Feb', budget: 30000, spent: 13980 },
+        { name: 'Mar', budget: 20000, spent: 9800 },
+        { name: 'Apr', budget: 27800, spent: 39080 },
+        { name: 'May', budget: 18900, spent: 4800 },
+        { name: 'Jun', budget: 23900, spent: 38000 },
     ];
 
     return (
         <div className="fade-in">
-            <h1 style={{ marginBottom: '30px' }}>Admin & Analytics</h1>
+            <h1 style={{ marginBottom: '30px' }}>Your Travel Analytics</h1>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
                 <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div style={{ padding: '16px', background: 'rgba(50, 130, 184, 0.2)', borderRadius: '12px', color: 'var(--primary-light)' }}>
-                        <Users size={32} />
+                        <Map size={32} />
                     </div>
                     <div>
-                        <div style={{ fontSize: '14px', color: '#aaa' }}>Total Users</div>
-                        <div style={{ fontSize: '28px', fontWeight: 'bold' }}>1,234</div>
-                        <div style={{ fontSize: '12px', color: '#4dff4d' }}>+12% this month</div>
+                        <div style={{ fontSize: '14px', color: '#aaa' }}>Places Visited</div>
+                        <div style={{ fontSize: '28px', fontWeight: 'bold' }}>12</div>
+                        <div style={{ fontSize: '12px', color: '#4dff4d' }}>3 this year</div>
                     </div>
                 </div>
                 <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -32,26 +39,16 @@ const Admin = () => {
                         <Briefcase size={32} />
                     </div>
                     <div>
-                        <div style={{ fontSize: '14px', color: '#aaa' }}>Trips Created</div>
-                        <div style={{ fontSize: '28px', fontWeight: 'bold' }}>856</div>
-                        <div style={{ fontSize: '12px', color: '#4dff4d' }}>+24% this month</div>
-                    </div>
-                </div>
-                <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <div style={{ padding: '16px', background: 'rgba(187, 225, 250, 0.2)', borderRadius: '12px', color: '#BBE1FA' }}>
-                        <Map size={32} />
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '14px', color: '#aaa' }}>Active Cities</div>
-                        <div style={{ fontSize: '28px', fontWeight: 'bold' }}>42</div>
-                        <div style={{ fontSize: '12px' }}>Global coverage</div>
+                        <div style={{ fontSize: '14px', color: '#aaa' }}>Total Trips</div>
+                        <div style={{ fontSize: '28px', fontWeight: 'bold' }}>8</div>
+                        <div style={{ fontSize: '12px', color: '#4dff4d' }}>+2 upcoming</div>
                     </div>
                 </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
                 <div className="glass-panel" style={{ padding: '30px' }}>
-                    <h3 style={{ marginBottom: '20px' }}>Growth Overview</h3>
+                    <h3 style={{ marginBottom: '20px' }}>Monthly Budget Usage (₹)</h3>
                     <div style={{ height: '300px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data}>
@@ -60,29 +57,25 @@ const Admin = () => {
                                 <YAxis stroke="#aaa" />
                                 <Tooltip contentStyle={{ backgroundColor: '#222', borderColor: '#444' }} />
                                 <Legend />
-                                <Bar dataKey="users" fill="#3282B8" />
-                                <Bar dataKey="trips" fill="#FF884B" />
+                                <Bar dataKey="budget" fill="#3282B8" name="Budget" />
+                                <Bar dataKey="spent" fill="#FF884B" name="Actual Spent" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
                 <div className="glass-panel" style={{ padding: '30px' }}>
-                    <h3 style={{ marginBottom: '20px' }}>Popular Destinations</h3>
+                    <h3 style={{ marginBottom: '20px' }}>Places Visited Log</h3>
                     <ul style={{ listStyle: 'none', padding: 0 }}>
-                        {[
-                            { name: 'Paris, France', count: 120 },
-                            { name: 'Tokyo, Japan', count: 98 },
-                            { name: 'New York, USA', count: 85 },
-                            { name: 'London, UK', count: 72 },
-                            { name: 'Bali, Indonesia', count: 65 }
-                        ].map((city, i) => (
-                            <li key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #333' }}>
-                                <span>{i + 1}. {city.name}</span>
-                                <span style={{ fontWeight: 'bold', color: 'var(--primary-light)' }}>{city.count}</span>
+                        {visitedPlaces.map((place, i) => (
+                            <li key={i} style={{ padding: '12px 0', borderBottom: '1px solid #333' }}>
+                                <div style={{ fontWeight: '500' }}>{place.name}</div>
+                                <div style={{ fontSize: '12px', color: '#aaa' }}>Visited: {place.date}</div>
+                                <button style={{ marginTop: '5px', fontSize: '10px', padding: '2px 8px' }} className="btn-secondary">Add Photos</button>
                             </li>
                         ))}
                     </ul>
+                    <button className="btn-primary" style={{ width: '100%', marginTop: '20px' }}>Add New Place</button>
                 </div>
             </div>
         </div>

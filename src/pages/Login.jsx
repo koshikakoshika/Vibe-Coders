@@ -4,19 +4,26 @@ import { useAuth } from '../context/AuthContext';
 import { Compass } from 'lucide-react';
 
 const Login = () => {
+    const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useAuth();
+    const [name, setName] = useState('');
+    const { login, signup } = useAuth();
     const navigate = useNavigate();
     const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
         try {
-            await login(email, password);
+            if (isLogin) {
+                await login(email, password);
+            } else {
+                await signup(name, email, password);
+            }
             navigate('/dashboard');
         } catch (err) {
-            setError('Failed to login');
+            setError(err.message || 'Authentication failed');
         }
     };
 
@@ -53,9 +60,31 @@ const Login = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {!isLogin && (
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '8px', color: '#ddd' }}>Full Name</label>
+                            <input
+                                required
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Your Name"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: 'white',
+                                    outline: 'none'
+                                }}
+                            />
+                        </div>
+                    )}
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', color: '#ddd' }}>Email</label>
                         <input
+                            required
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -74,6 +103,7 @@ const Login = () => {
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', color: '#ddd' }}>Password</label>
                         <input
+                            required
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -90,14 +120,31 @@ const Login = () => {
                         />
                     </div>
 
+                    {error && (
+                        <div style={{ color: '#ff6b6b', fontSize: '14px', textAlign: 'center' }}>
+                            {error}
+                        </div>
+                    )}
+
                     <button type="submit" className="btn-primary" style={{ marginTop: '10px' }}>
-                        Start Journey
+                        {isLogin ? 'Start Journey' : 'Create Account'}
                     </button>
                 </form>
 
                 <p style={{ textAlign: 'center', marginTop: '20px', color: '#999', fontSize: '14px' }}>
-                    Just click "Start Journey" to demo
+                    {isLogin ? "Don't have an account? " : "Already have an account? "}
+                    <button
+                        onClick={() => { setIsLogin(!isLogin); setError(''); }}
+                        style={{ color: 'var(--primary-light)', fontWeight: 'bold' }}
+                    >
+                        {isLogin ? 'Sign up' : 'Login'}
+                    </button>
                 </p>
+                <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', color: '#666' }}>
+                    Demo Credentials:<br />
+                    Email: demo@globetrotter.com<br />
+                    Pass: demo123
+                </div>
             </div>
         </div>
     );

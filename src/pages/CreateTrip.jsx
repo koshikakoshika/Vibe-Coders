@@ -5,13 +5,15 @@ import { Calendar, MapPin, DollarSign, Users, Sparkles } from 'lucide-react';
 
 const CreateTrip = () => {
     const navigate = useNavigate();
-    const { addTrip } = useTrips();
+    const { addTrip, currency, currencySymbol, rates } = useTrips();
     const [formData, setFormData] = useState({
         destination: '',
         startDate: '',
         endDate: '',
-        budget: '',
-        travelers: 1
+        budget: '', // Stores the RAW input value
+        travelers: 1,
+        description: '',
+        imageUrl: ''
     });
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -23,18 +25,20 @@ const CreateTrip = () => {
         e.preventDefault();
         setIsGenerating(true);
 
-        // Simulate AI generation delay
+        const currentRate = rates[currency] || 1;
+        // Convert input budget to INR for storage
+        const budgetInINR = Math.round(Number(formData.budget) / currentRate);
+
         setTimeout(() => {
-            // Create basic trip structure
-            const days = calculateDays(formData.startDate, formData.endDate);
+            const daysCount = calculateDays(formData.startDate, formData.endDate);
             const itinerary = [];
 
-            // Mock AI generating an itinerary
-            for (let i = 0; i < days; i++) {
+            // Generate unique activities for each day to prevent duplication bug
+            for (let i = 0; i < daysCount; i++) {
                 const date = addDays(formData.startDate, i);
                 itinerary.push({
                     date,
-                    activities: generateMockActivities(formData.destination, i)
+                    activities: generateMockActivities(formData.destination, i + 1) // Pass day number for uniqueness
                 });
             }
 
@@ -43,27 +47,24 @@ const CreateTrip = () => {
                 destination: formData.destination,
                 startDate: formData.startDate,
                 endDate: formData.endDate,
-                budget: Number(formData.budget),
+                budget: budgetInINR,
                 travelers: Number(formData.travelers),
+                description: formData.description || `A wonderful trip to ${formData.destination}`,
                 itinerary: itinerary,
-                image: `https://source.unsplash.com/800x600/?${formData.destination},travel` // Unsplash source might be deprecated/redirect, usage cautious
-                // Using a generic fallback in real app or specific images.
-                // For now, let's use a static Unsplash Search URL method nicely or just a placeholder if it fails.
+                image: formData.imageUrl || `https://source.unsplash.com/800x600/?${formData.destination},travel`
             });
 
             setIsGenerating(false);
             navigate(`/trips/${newTrip.id}`);
-        }, 2000);
+        }, 2500);
     };
 
-    // Helper to add days
     const addDays = (dateStr, days) => {
         const result = new Date(dateStr);
         result.setDate(result.getDate() + days);
         return result.toISOString().split('T')[0];
     };
 
-    // Helper to calc duration
     const calculateDays = (start, end) => {
         const d1 = new Date(start);
         const d2 = new Date(end);
@@ -71,14 +72,35 @@ const CreateTrip = () => {
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     };
 
-    const generateMockActivities = (dest, dayIndex) => {
-        // Very basic mock
-        return [
-            { id: `d${dayIndex}-a1`, time: '09:00', title: 'Breakfast at local cafe', type: 'food', cost: 20 },
-            { id: `d${dayIndex}-a2`, time: '11:00', title: `Explore ${dest} Center`, type: 'sightseeing', cost: 0 },
-            { id: `d${dayIndex}-a3`, time: '14:00', title: 'Museum Visit', type: 'culture', cost: 25 },
-            { id: `d${dayIndex}-a4`, time: '19:00', title: 'Dinner', type: 'food', cost: 50 },
+    // Improved Mock Activity Generator
+    const generateMockActivities = (dest, dayNum) => {
+        const activities = [
+            [
+                { time: '09:00', title: 'Breakfast at City Cafe', type: 'food', cost: 500 },
+                { time: '11:00', title: `City Tour: ${dest} Landmarks`, type: 'sightseeing', cost: 1200 },
+                { time: '14:00', title: 'Local Market Visit', type: 'culture', cost: 0 },
+                { time: '19:00', title: 'Welcome Dinner', type: 'food', cost: 1500 }
+            ],
+            [
+                { time: '10:00', title: 'Museum & Art Gallery', type: 'culture', cost: 800 },
+                { time: '13:00', title: 'Lunch at Hidden Gem', type: 'food', cost: 600 },
+                { time: '16:00', title: 'Sunset Viewpoint', type: 'sightseeing', cost: 0 },
+                { time: '20:00', title: 'Live Music Event', type: 'culture', cost: 1000 }
+            ],
+            [
+                { time: '08:00', title: 'Morning Nature Walk', type: 'sightseeing', cost: 0 },
+                { time: '12:00', title: 'Adventure Activity', type: 'other', cost: 2500 },
+                { time: '18:00', title: 'Shopping Street', type: 'culture', cost: 2000 },
+                { time: '21:00', title: 'Rooftop Dinner', type: 'food', cost: 1800 }
+            ]
         ];
+
+        // Cycle through templates based on day number to ensure variety
+        const template = activities[(dayNum - 1) % activities.length];
+        return template.map((act, idx) => ({
+            id: `d${dayNum}-a${idx}`,
+            ...act
+        }));
     };
 
     return (
@@ -90,7 +112,7 @@ const CreateTrip = () => {
                     <Sparkles size={48} className="fade-in" style={{ color: 'var(--warm)', marginBottom: '20px', animation: 'spin 3s linear infinite' }} />
                     <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
                     <h2>Consulting GlobeBot AI...</h2>
-                    <p style={{ color: '#aaa' }}>Crafting the perfect itinerary for {formData.destination}...</p>
+                    <p style={{ color: '#aaa' }}>Crafting a unique day-by-day itinerary for {formData.destination}...</p>
                 </div>
             ) : (
                 <div className="glass-panel" style={{ padding: '40px' }}>
@@ -104,10 +126,33 @@ const CreateTrip = () => {
                                     name="destination"
                                     value={formData.destination}
                                     onChange={handleChange}
-                                    placeholder="e.g. Tokyo, Paris, New York"
+                                    placeholder="e.g. Manali, Goa, Jaipur"
                                     style={{ width: '100%', padding: '12px 12px 12px 40px', borderRadius: '8px', border: '1px solid #444', background: 'rgba(0,0,0,0.2)', color: 'white' }}
                                 />
                             </div>
+                        </div>
+
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '8px' }}>Trip Description (Optional)</label>
+                            <textarea
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                placeholder="Describe your trip goal e.g. 'Relaxing weekend getaway'"
+                                rows="3"
+                                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #444', background: 'rgba(0,0,0,0.2)', color: 'white', resize: 'vertical' }}
+                            />
+                        </div>
+
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '8px' }}>Cover Image URL (Optional)</label>
+                            <input
+                                name="imageUrl"
+                                value={formData.imageUrl}
+                                onChange={handleChange}
+                                placeholder="https://example.com/image.jpg"
+                                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #444', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+                            />
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -137,7 +182,7 @@ const CreateTrip = () => {
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '8px' }}>Budget (USD)</label>
+                                <label style={{ display: 'block', marginBottom: '8px' }}>Budget ({currency} {currencySymbol})</label>
                                 <div style={{ position: 'relative' }}>
                                     <DollarSign size={20} style={{ position: 'absolute', left: '12px', top: '12px', color: '#aaa' }} />
                                     <input
@@ -146,7 +191,7 @@ const CreateTrip = () => {
                                         name="budget"
                                         value={formData.budget}
                                         onChange={handleChange}
-                                        placeholder="2000"
+                                        placeholder="50000"
                                         style={{ width: '100%', padding: '12px 12px 12px 40px', borderRadius: '8px', border: '1px solid #444', background: 'rgba(0,0,0,0.2)', color: 'white' }}
                                     />
                                 </div>

@@ -6,34 +6,40 @@ import { Plus, Calendar, MapPin, ArrowRight } from 'lucide-react';
 
 const Dashboard = () => {
     const { user } = useAuth();
-    const { trips } = useTrips();
+    const { trips, currencySymbol, convertCost } = useTrips();
 
-    // Mock recommendations
+    // Mock recommendations (India Focused)
     const recommendations = [
         {
             id: 1,
-            title: 'Kyoto in Autumn',
-            location: 'Kyoto, Japan',
-            image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=800',
-            days: 7,
-            price: '$1,800'
+            title: 'Royal Rajasthan',
+            location: 'Jaipur & Udaipur, India',
+            image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&q=80&w=800',
+            days: 6,
+            price: '₹25,000'
         },
         {
             id: 2,
-            title: 'Amalfi Coast Drive',
-            location: 'Amalfi, Italy',
-            image: 'https://images.unsplash.com/photo-1633321088355-d0f8c1eaad48?auto=format&fit=crop&q=80&w=800',
-            days: 5,
-            price: '$2,200'
+            title: 'Kerala Backwaters',
+            location: 'Alleppey, India',
+            image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&q=80&w=800',
+            days: 4,
+            price: '₹18,000'
         },
         {
             id: 3,
-            title: 'Safari Adventure',
-            location: 'Serengeti, Tanzania',
-            image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=800',
-            days: 10,
-            price: '$3,500'
+            title: 'Himalayan Trek',
+            location: 'Manali, India',
+            image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&q=80&w=800',
+            days: 5,
+            price: '₹12,000'
         }
+    ];
+
+    const quickActions = [
+        { icon: <Plus size={20} />, label: 'Plan Trip', link: '/create-trip', color: 'var(--primary)' },
+        { icon: <MapPin size={20} />, label: 'Explore Cities', link: '/explore', color: 'var(--warm)' },
+        { icon: <Calendar size={20} />, label: 'My Calendar', link: '/trips', color: '#00C49F' }
     ];
 
     return (
@@ -46,7 +52,25 @@ const Dashboard = () => {
                 <p style={{ color: 'var(--text-muted)' }}>Ready for your next adventure?</p>
             </header>
 
-            {/* Quick Action Banner */}
+            {/* Quick Actions Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+                {quickActions.map((action, i) => (
+                    <Link key={i} to={action.link} className="glass-panel" style={{
+                        padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', textDecoration: 'none',
+                        transition: 'transform 0.2s', borderLeft: `4px solid ${action.color}`
+                    }}
+                        onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                        onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                        <div style={{ padding: '10px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', color: action.color }}>
+                            {action.icon}
+                        </div>
+                        <span style={{ fontSize: '18px', fontWeight: '500', color: 'white' }}>{action.label}</span>
+                    </Link>
+                ))}
+            </div>
+
+            {/* Banner */}
             <div className="glass-panel" style={{
                 padding: '30px',
                 marginBottom: '40px',
@@ -56,13 +80,14 @@ const Dashboard = () => {
                 background: 'linear-gradient(135deg, rgba(15, 76, 117, 0.3), rgba(30,30,30,0.5))'
             }}>
                 <div>
-                    <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>Plan a New Trip</h2>
+                    <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>AI-Powered Travel Assistant</h2>
                     <p style={{ color: '#ccc', maxWidth: '500px' }}>
-                        Let our AI assist you in building the perfect itinerary. Tell GlobeBot where you want to go.
+                        Need help? Chat with GlobeBot to discover hidden gems and build perfect itineraries in seconds.
                     </p>
                 </div>
+                {/* Chatbot trigger handled by floating widget, maybe link to create trip here too */}
                 <Link to="/create-trip" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Plus size={20} /> Create Trip
+                    <Plus size={20} /> Plan New Adventure
                 </Link>
             </div>
 
@@ -82,7 +107,7 @@ const Dashboard = () => {
                 ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                         {trips.slice(0, 3).map(trip => (
-                            <div key={trip.id} className="glass-panel" style={{ overflow: 'hidden', transition: 'transform 0.2s', cursor: 'pointer' }}>
+                            <Link to={`/trips/${trip.id}`} key={trip.id} className="glass-panel" style={{ overflow: 'hidden', transition: 'transform 0.2s', cursor: 'pointer', display: 'block', textDecoration: 'none', color: 'inherit' }}>
                                 <div style={{ height: '160px', overflow: 'hidden' }}>
                                     <img src={trip.image || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=800'}
                                         alt={trip.title}
@@ -97,7 +122,7 @@ const Dashboard = () => {
                                         <Calendar size={14} /> {trip.startDate}
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 )}
@@ -122,14 +147,14 @@ const Dashboard = () => {
                             <div style={{ padding: '20px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                                     <h3 style={{ fontSize: '18px' }}>{place.title}</h3>
-                                    <span style={{ color: 'var(--warm)', fontWeight: 'bold' }}>{place.price}</span>
+                                    <span style={{ color: 'var(--warm)', fontWeight: 'bold' }}>{currencySymbol}{convertCost(parseInt(place.price.replace(/[^0-9]/g, '')))}</span>
                                 </div>
                                 <div style={{ color: '#aaa', fontSize: '14px', marginBottom: '16px' }}>
                                     {place.location}
                                 </div>
-                                <button className="btn-secondary" style={{ width: '100%', fontSize: '14px', padding: '8px' }}>
+                                <Link to="/create-trip" className="btn-secondary" style={{ width: '100%', fontSize: '14px', padding: '8px', display: 'block', textAlign: 'center' }}>
                                     Explore Itinerary
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     ))}

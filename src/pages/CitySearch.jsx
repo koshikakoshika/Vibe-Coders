@@ -71,6 +71,37 @@ const CitySearch = () => {
                         </div>
                     </div>
                 ))}
+                {/* Activities Section */}
+                <div style={{ marginTop: '60px' }}>
+                    <h2 style={{ marginBottom: '30px' }}>Adventure Activities</h2>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                        {[
+                            { title: 'Bungee Jumping', loc: 'Rishikesh, India', img: 'https://images.unsplash.com/photo-1544365558-35aa4afcf11f?q=80&w=800', price: '₹3,500' },
+                            { title: 'Paragliding', loc: 'Bir Billing, India', img: 'https://images.unsplash.com/photo-1624326522206-aa924c5885c4?q=80&w=800', price: '₹2,500' },
+                            { title: 'Forest Walk', loc: 'Kerala, India', img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=800', price: '₹500' },
+                            { title: 'Boating', loc: 'Nainital, India', img: 'https://images.unsplash.com/photo-1544983058-293627d7e395?q=80&w=800', price: '₹800' },
+                            { title: 'Trekking', loc: 'Triund, India', img: 'https://images.unsplash.com/photo-1533552097365-c33c373a6998?q=80&w=800', price: 'Free' }
+                        ].map((act, i) => (
+                            <div key={i} className="glass-panel" style={{ overflow: 'hidden' }}>
+                                <div style={{ height: '180px', overflow: 'hidden' }}>
+                                    <img src={act.img} alt={act.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </div>
+                                <div style={{ padding: '20px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                        <h3 style={{ fontSize: '18px' }}>{act.title}</h3>
+                                        <span style={{ color: 'var(--warm)', fontWeight: 'bold' }}>{act.price}</span>
+                                    </div>
+                                    <div style={{ color: '#aaa', fontSize: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <MapPin size={14} /> {act.loc}
+                                    </div>
+                                    <button className="btn-secondary" style={{ width: '100%', padding: '8px' }} onClick={() => navigate('/create-trip')}>
+                                        Add to Trip
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );

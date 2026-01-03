@@ -8,6 +8,7 @@ export const useTrips = () => useContext(TripContext);
 export const TripProvider = ({ children }) => {
     const [trips, setTrips] = useState([]);
     const [currentTrip, setCurrentTrip] = useState(null);
+    const [currency, setCurrency] = useState('INR');
 
     useEffect(() => {
         const storedTrips = localStorage.getItem('globeTrotterTrips');
@@ -94,6 +95,28 @@ export const TripProvider = ({ children }) => {
         }));
     };
 
+    // Exchange rates (approximate for demo)
+    const rates = {
+        INR: 1,
+        USD: 0.012,
+        EUR: 0.011
+    };
+
+    // Symbols
+    const currencySymbols = {
+        INR: '₹',
+        USD: '$',
+        EUR: '€'
+    };
+
+    const convertCost = (amount) => {
+        // Base is INR (as the mock data is now mostly INR or ambiguous)
+        // If data was stored in INR, just multiply. 
+        // For this demo, let's assume stored values are INR.
+        if (!amount) return 0;
+        return Math.round(amount * rates[currency]);
+    };
+
     const value = {
         trips,
         currentTrip,
@@ -101,7 +124,12 @@ export const TripProvider = ({ children }) => {
         updateTrip,
         deleteTrip,
         selectTrip,
-        addActivityToTrip
+        addActivityToTrip,
+        currency,
+        setCurrency,
+        convertCost,
+        rates, // Expose rates for inverse conversion
+        currencySymbol: currencySymbols[currency]
     };
 
     return (

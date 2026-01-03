@@ -6,7 +6,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, L
 
 const ItineraryView = () => {
     const { tripId } = useParams();
-    const { trips, selectTrip, currentTrip, addActivityToTrip } = useTrips();
+    const { trips, selectTrip, currentTrip, addActivityToTrip, currencySymbol, convertCost } = useTrips();
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
     const [showAddModal, setShowAddModal] = useState(false);
     const [newActivity, setNewActivity] = useState({ title: '', time: '09:00', type: 'sightseeing', cost: 0 });
@@ -23,7 +23,8 @@ const ItineraryView = () => {
     }
 
     const days = currentTrip.itinerary || [];
-    const selectedDay = days[selectedDayIndex] || { date: currentTrip.startDate, activities: [] };
+    // Ensure we are selecting the correct day object, not defaulting to first day if index is valid
+    const selectedDay = (days.length > 0 && days[selectedDayIndex]) ? days[selectedDayIndex] : { date: currentTrip.startDate, activities: [] };
 
     // Calculate costs
     const totalCost = days.reduce((acc, day) => {
@@ -38,7 +39,7 @@ const ItineraryView = () => {
         return acc;
     }, {});
 
-    const chartData = Object.keys(costByCategory).map(key => ({ name: key, value: costByCategory[key] }));
+    const chartData = Object.keys(costByCategory).map(key => ({ name: key, value: convertCost(costByCategory[key]) }));
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
     const handleAddActivity = () => {
@@ -71,15 +72,23 @@ const ItineraryView = () => {
                             <MapPin size={16} /> {currentTrip.destination}
                         </span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <DollarSign size={16} /> Budget: ${currentTrip.budget}
+                            <DollarSign size={16} /> Budget: {currencySymbol}{convertCost(currentTrip.budget)}
                         </span>
                     </div>
                 </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
-                    <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                        onClick={() => alert("Share Link Copied to Clipboard! (Demo)")}
+                        className="btn-secondary"
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                    >
                         <Share2 size={16} /> Share
                     </button>
-                    <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                        onClick={() => window.print()}
+                        className="btn-secondary"
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                    >
                         <Printer size={16} /> Print
                     </button>
                 </div>
@@ -146,7 +155,7 @@ const ItineraryView = () => {
                                         <div style={{ flex: 1 }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                                                 <h3 style={{ fontSize: '18px' }}>{act.title}</h3>
-                                                <span style={{ fontWeight: 'bold' }}>${act.cost}</span>
+                                                <span style={{ fontWeight: 'bold' }}>{currencySymbol}{convertCost(act.cost)}</span>
                                             </div>
                                             <div style={{ display: 'flex', gap: '10px' }}>
                                                 <span style={{
@@ -195,24 +204,31 @@ const ItineraryView = () => {
                         <div style={{ marginTop: '16px', borderTop: '1px solid #444', paddingTop: '16px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                                 <span>Total Spent</span>
-                                <span style={{ fontWeight: 'bold', color: totalCost > currentTrip.budget ? '#ff4d4d' : '#4dff4d' }}>${totalCost}</span>
+                                <span style={{ fontWeight: 'bold', color: totalCost > currentTrip.budget ? '#ff4d4d' : '#4dff4d' }}>{currencySymbol}{convertCost(totalCost)}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', color: '#aaa' }}>
                                 <span>Budget</span>
-                                <span>${currentTrip.budget}</span>
+                                <span>{currencySymbol}{convertCost(currentTrip.budget)}</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Map Placeholder */}
+                    {/* Interactive Map Mock */}
                     <div className="glass-panel" style={{ padding: '0', overflow: 'hidden', height: '300px', position: 'relative' }}>
-                        <img
-                            src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=600&q=80"
-                            alt="Map"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }}
-                        />
-                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontWeight: 'bold' }}>
-                            Interactive Map View
+                        <iframe
+                            width="100%"
+                            height="100%"
+                            frameBorder="0"
+                            style={{ border: 0, opacity: 0.8 }}
+                            // Note: Using OpenStreetMap for demo to avoid API key requirement issues in playback
+                            src={`https://www.openstreetmap.org/export/embed.html?bbox=-180,-90,180,90&layer=mapnik&marker=${encodeURIComponent(currentTrip.destination)}`}
+                        ></iframe>
+                        <div style={{
+                            position: 'absolute', bottom: '10px', left: '10px',
+                            background: 'rgba(0,0,0,0.7)', padding: '5px 10px', borderRadius: '4px',
+                            pointerEvents: 'none'
+                        }}>
+                            <span style={{ fontSize: '12px' }}>Interactive Map: {currentTrip.destination}</span>
                         </div>
                     </div>
                 </div>

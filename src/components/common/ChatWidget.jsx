@@ -46,17 +46,86 @@ const ChatWidget = () => {
     };
 
     const generateResponse = (input, path) => {
-        const lower = input.toLowerCase();
-        if (lower.includes('budget') || lower.includes('cost')) {
-            return "I can help you optimize your budget. For this trip, I'd suggest looking at local dining options to save about 20%.";
+        try {
+            const lower = input.toLowerCase();
+            const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+            // --- CONTEXT EXTRACTION ---
+            const cityMatch = input.match(/\b(Goa|Kerala|Manali|Jaipur|Ooty|Coimbatore|Paris|London|Munnar|Udaipur|Rishikesh|Delhi|Mumbai|Chennai|Bangalore|Hyderabad)\b/i);
+            const city = cityMatch ? cityMatch[0] : (path.includes('trips') ? 'current destination' : null);
+
+            const budgetMatch = input.match(/\b(budget|cheap|expensive|cost|price|rupees|rs|INR)\b/i);
+            const foodMatch = input.match(/\b(food|eat|restaurant|dinner|lunch|breakfast|cafe|drink)\b/i);
+            const activityMatch = input.match(/\b(do|visit|see|sightseeing|activity|adventure)\b/i);
+            const peopleMatch = input.match(/\b(\d+)\s*(people|pax|persons)|couple|family|solo\b/i);
+
+            // --- INTELLIGENT ROUTING ---
+
+            // 1. SPECIFIC CITY INQUIRIES
+            if (city && city !== 'current destination') {
+                const cityName = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
+
+                if (foodMatch) {
+                    if (cityName === 'Coimbatore') return "For Coimbatore, you must try the Annapoorna Gowrishankar for Sambar Idli. For specific non-veg, Haribhavanam is legendary!";
+                    if (cityName === 'Ooty') return "In Ooty, try Earl's Secret for a colonial dining experience, or Place to Bee for organic food. Don't miss the homemade chocolates near the bus stand!";
+                    if (cityName === 'Goa') return "Goa is a food paradise! Try Fisherman's Wharf for Goan curry, or Gunpowder for unique regional dishes. For budget eats, the beach shacks are best.";
+                    if (cityName === 'Manali') return "Manali has great cafes. Cafe 1947 by the river is iconic. For local Himachali food, try hidden gems in Old Manali.";
+                    if (cityName === 'Jaipur') return "Jaipur means Pyaz Kachori at Rawat Mishtan Bhandar. For dinner, Chokhi Dhani offers a complete cultural experience.";
+                    return `I know some great food spots in ${cityName}! Are you looking for street food or fine dining?`;
+                }
+
+                if (activityMatch) {
+                    if (cityName === 'Ooty') return "In Ooty, take a ride on the Nilgiri Mountain Railway, visit the Botanical Gardens, and do boating in Pykara Lake.";
+                    if (cityName === 'Coimbatore') return "Visit the Adiyogi Shiva Statue, Marudamalai Temple, and take a drive to Valparai for scenic tea estates.";
+                    if (cityName === 'Goa') return "Beyond beaches, visit the Dudhsagar Falls, the Latin Quarter in Panjim, and the historic Fort Aguada.";
+                    return `Top things to do in ${cityName} include visiting the main landmarks and exploring local markets. Shall I draft a day plan?`;
+                }
+
+                if (budgetMatch) {
+                    if (cityName === 'Ooty' || cityName === 'Coimbatore') return `${cityName} is very affordable. A decent hotel is ₹1500-2500, and food for a day can be under ₹500 per person.`;
+                    return `Budgeting for ${cityName}? Expect around ₹2000-4000 per day for a comfortable mid-range trip including stay and food.`;
+                }
+
+                return `I love ${cityName}! It's a great choice. Ask me about 'food', 'places to see', or 'budget' for ${cityName}.`;
+            }
+
+            // 2. CONTEXTUAL HELP (No specific city detected in input)
+            if (path.includes('create')) {
+                return "I see you are in the Trip Creator. To get the best results, start by typing the destination name (like 'Ooty' or 'Goa') in the input field above!";
+            }
+
+            if (lower.includes('suggest') || lower.includes('couple') || lower.includes('family')) {
+                const groupType = lower.includes('couple') ? 'couple' : lower.includes('family') ? 'family' : 'group';
+                if (groupType === 'couple') return "For couples, I strongly recommend Kerala (Munnar/Alleppey) or a quiet beach in South Goa. Manali is also great for romantic views.";
+                if (groupType === 'family') return "Trips with family are best in places like Jaipur (Culture), Ooty (Relaxed), or Singapore (Activities). How many days do you have?";
+            }
+
+            // 3. GENERAL FALLBACKS
+            if (lower.includes('first time')) {
+                return "For a first-time trip, I recommend sticking to popular routes. In South India, Ooty-Mysore-Coorg is a classic loop. In North India, the Golden Triangle never fails.";
+            }
+
+            // 4. Greetings
+            if (lower.match(/\b(hi|hello|hey|greetings)\b/)) {
+                return pick([
+                    "Namaste! Where are you planning to travel today?",
+                    "Hello! Ready to explore some amazing destinations?",
+                    "Hey there! I'm your AI travel buddy. Ask me about trips, budget, or food!"
+                ]);
+            }
+
+            // Default
+            return pick([
+                "I can help with itineraries, food spots, or budget tips. Try asking 'Best food in Ooty' or 'Places to visit in Goa'.",
+                "That sounds like a plan! Where exactly are you thinking of going?",
+                "I'm scanning my travel database... Could you specify which city you are interested in?",
+                "I'm here to help you plan. Tell me your destination and budget!"
+            ]);
+
+        } catch (error) {
+            console.error("AI Error", error);
+            return "I'm having trouble connecting to the travel database right now. Please try again.";
         }
-        if (lower.includes('restaurant') || lower.includes('food')) {
-            return "Based on your location, 'Le Petit Bistro' is highly rated and fits your preferences.";
-        }
-        if (path.includes('create')) {
-            return "I can generate a full itinerary for you! Just fill in the destination and dates.";
-        }
-        return "That sounds like a great idea! I can add that to your itinerary. Would you like me to find available times?";
     };
 
     return (
@@ -80,7 +149,7 @@ const ChatWidget = () => {
                     zIndex: 1000,
                     cursor: 'pointer',
                     border: 'none',
-                    transition: 'transfrom 0.2s'
+                    transition: 'transform 0.2s'
                 }}
                 className="hover-scale"
             >
